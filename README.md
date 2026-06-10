@@ -1,1 +1,6 @@
-My first big C++ game inshaAllah.
+# Terraria Clone
+
+- [] Texture Rendering
+- [] World Generation
+- [] Simple Physics
+- [] Inventory System
