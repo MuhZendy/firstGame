@@ -1,0 +1,21 @@
+/out
+bin/
+build/
+
+/.vscode/
+*.o
+*.obj
+
+# Ignore CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Ignore Visual Studio files
+*.sln
+*.vcxproj*
+*.user
+
+settings/
+saves/
