@@ -23,9 +23,16 @@ void imGuiWindow() {
 }
 
 int main() {
+
+#if PRODUCTION_BUILD == 1
+    SetTraceLogLevel(LOG_ERROR); // Only log errors in production builds
+#endif
+
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(800, 600, "Resizable Window Example");
-    
+    SetExitKey(0); // Disable default exit key (ESC)
+    SetTargetFPS(60);
+
     rlImGuiSetup(true);
 
 #pragma region ImGui Configuration
@@ -41,7 +48,7 @@ int main() {
 
     while (!WindowShouldClose()) {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
         
         rlImGuiBegin();
         ImGui::PushStyleColor(ImGuiCol_WindowBg, {}); // Make the main window background transparent
@@ -61,6 +68,7 @@ int main() {
     rlImGuiShutdown();
 
     CloseWindow();
+    std::cout << "Game requested to close.\n";
 
     return 0;
 }
