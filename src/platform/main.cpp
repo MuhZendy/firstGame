@@ -1,9 +1,12 @@
 #include <iostream>
+
 #include "raylib.h"
 #include "imgui.h"
 #include "rlImGui.h"
 
-void imGuiWindow2() {
+#include "gameMain.h"
+
+void imGuiWindow() {
     ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
     ImGui::Begin("Second Window", nullptr, windowFlags);
     static char buffer[128] = "";
@@ -31,6 +34,11 @@ int main() {
     io.FontGlobalScale = 2.0f; // Scale ImGui fonts for better visibility
 #pragma endregion
 
+    if (!initGame()) {
+        std::cerr << "Failed to initialize game.\n";
+        return -1;
+    }
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -41,18 +49,9 @@ int main() {
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::PopStyleColor(2); // Pop the two colors we pushed
 
-        DrawRectangle(150, 150, 200, 150, Color{ 0, 121, 241, 127 });
-        DrawRectangle(100, 100, 200, 150, Color{ 230, 41, 55, 127 });
-
-        ImGui::ShowDemoWindow();
-        ImGui::Begin("Hello, ImGui!");
-        ImGui::Text("This is a resizable window example using raylib and ImGui.");
-        if (ImGui::Button("Click Me")) {
-            std::cout << "Button Clicked!" << std::endl;
+        if (!updateGame()) {
+            CloseWindow();
         }
-        ImGui::End();
-
-        imGuiWindow2();
 
         rlImGuiEnd();
 
