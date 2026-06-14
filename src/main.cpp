@@ -4,12 +4,18 @@
 #include "rlImGui.h"
 
 void imGuiWindow2() {
-    ImGui::Begin("Second Window");
-    ImGui::Text("This is the second window.");
-    ImGui::Separator();
-    ImGui::NewLine();
-    static float sliderValue = 0.0f;
-    ImGui::SliderFloat("Slider", &sliderValue, 0.0f, 100.0f);
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
+    ImGui::Begin("Second Window", nullptr, windowFlags);
+    static char buffer[128] = "";
+    ImGuiInputTextFlags flags =
+        ImGuiInputTextFlags_CharsNoBlank |        // no spaces
+        ImGuiInputTextFlags_EnterReturnsTrue |    // return true on Enter
+        ImGuiInputTextFlags_AutoSelectAll;        // select all text when focused
+    
+    if (ImGui::InputText("Player Name", buffer, sizeof(buffer), flags))
+    {
+        std::cout << "Confirmed name: " << buffer << "\n";
+    }
     ImGui::End();
 }
 
