@@ -16,11 +16,11 @@ bool initGame() {
     assetManager.loadAll();
 
     gameState.gameMap.create(10, 10); // Example: create a 10x10 game map
-    gameState.gameMap.getBlock(0, 0).id = Block::DIRT;
-    gameState.gameMap.getBlock(1, 1).id = Block::DIRT;
-    gameState.gameMap.getBlock(2, 2).id = Block::DIRT;
-    gameState.gameMap.getBlock(3, 3).id = Block::DIRT;
-    gameState.gameMap.getBlock(4, 4).id = Block::DIRT;
+    gameState.gameMap.getBlock(0, 0).id = Block::dirt;
+    gameState.gameMap.getBlock(1, 1).id = Block::glass;
+    gameState.gameMap.getBlock(2, 2).id = Block::stone;
+    gameState.gameMap.getBlock(3, 3).id = Block::gold;
+    gameState.gameMap.getBlock(4, 4).id = Block::furnace;
 
     gameState.camera.target = { 0, 0 };
     gameState.camera.rotation = 0.0f;
@@ -48,12 +48,14 @@ bool updateGame() {
     for (int y = 0; y < gameState.gameMap.height; ++y) {
         for (int x = 0; x < gameState.gameMap.width; ++x) {
             Block& block = gameState.gameMap.getBlock(x, y);
-            if (block.id != Block::AIR) {
-                float size = 1.0f; // Size of the block to draw
-                float posX = x * size;
-                float posY = y * size;
-                DrawTexturePro(assetManager.dirt, { 0, 0, (float)assetManager.dirt.width, (float)assetManager.dirt.height }, 
-                    { posX, posY, size, size }, {}, 0, WHITE);
+            if (block.id != Block::air) {
+                Rectangle textureUV;
+                textureUV.width = 32.0f; // Assuming each block texture is 32x32 pixels
+                textureUV.height = 32.0f;
+                textureUV.x = block.id * textureUV.width; // Assuming 8 blocks per row in the texture atlas
+                textureUV.y = 0.0f; // Assuming all blocks are in the first row of the texture atlas
+                DrawTexturePro(assetManager.texture, textureUV, 
+                    { (float)x, (float)y, 1.0f, 1.0f }, {}, 0, WHITE);
             }
         }
     }
