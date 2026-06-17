@@ -6,6 +6,7 @@
 struct GameState {
     // Add game state variables here
     GameMap gameMap;
+    Camera2D camera;
 } gameState;
 
 AssetManager assetManager;
@@ -21,20 +22,34 @@ bool initGame() {
     gameState.gameMap.getBlock(3, 3).id = Block::DIRT;
     gameState.gameMap.getBlock(4, 4).id = Block::DIRT;
 
+    gameState.camera.target = { 0, 0 };
+    gameState.camera.rotation = 0.0f;
+    gameState.camera.zoom = 100.0f;
+
     return true; // Return false if initialization fails
 }
 
 bool updateGame() {
     // Update game logic here
     // Return false if the game should be closed
+    ClearBackground(BLUE);
+
     float deltaTime = GetFrameTime();
     if (deltaTime > 0.1f) deltaTime = 0.1f; // Cap deltaTime to avoid big jumps
+
+    if (IsKeyDown(KEY_W)) gameState.camera.target.y -= 7.0f * deltaTime;
+    if (IsKeyDown(KEY_S)) gameState.camera.target.y += 7.0f * deltaTime;
+    if (IsKeyDown(KEY_A)) gameState.camera.target.x -= 7.0f * deltaTime;
+    if (IsKeyDown(KEY_D)) gameState.camera.target.x += 7.0f * deltaTime;
+
+    gameState.camera.offset = { (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2 };
+    BeginMode2D(gameState.camera);
 
     for (int y = 0; y < gameState.gameMap.height; ++y) {
         for (int x = 0; x < gameState.gameMap.width; ++x) {
             Block& block = gameState.gameMap.getBlock(x, y);
             if (block.id != Block::AIR) {
-                float size = 50.0f; // Size of the block to draw
+                float size = 1.0f; // Size of the block to draw
                 float posX = x * size;
                 float posY = y * size;
                 DrawTexturePro(assetManager.dirt, { 0, 0, (float)assetManager.dirt.width, (float)assetManager.dirt.height }, 
@@ -42,6 +57,8 @@ bool updateGame() {
             }
         }
     }
+
+    EndMode2D();
 
     return true;
 }
