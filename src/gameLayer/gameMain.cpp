@@ -2,7 +2,7 @@
 #include "raylib.h"
 #include "gameMain.h"
 #include "gameMap.h"
-
+#include "helpers.h"
 struct GameState {
     // Add game state variables here
     GameMap gameMap;
@@ -49,11 +49,7 @@ bool updateGame() {
         for (int x = 0; x < gameState.gameMap.width; ++x) {
             Block& block = gameState.gameMap.getBlock(x, y);
             if (block.id != Block::air) {
-                Rectangle textureUV;
-                textureUV.width = 32.0f; // Assuming each block texture is 32x32 pixels
-                textureUV.height = 32.0f;
-                textureUV.x = block.id * textureUV.width; // Assuming 8 blocks per row in the texture atlas
-                textureUV.y = 0.0f; // Assuming all blocks are in the first row of the texture atlas
+                Rectangle textureUV = getTextureAtlasUV(block.id, 0, 32, 32); // Assuming each block texture is 32x32 pixels
                 DrawTexturePro(assetManager.texture, textureUV, 
                     { (float)x, (float)y, 1.0f, 1.0f }, {}, 0, WHITE);
             }
