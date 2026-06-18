@@ -57,6 +57,7 @@ struct Block {
 		boneWordrobe,
 		boneBookShelf,
 		bonePlatform,
+		pearl,
 
 		BLOCKS_COUNT,
     };

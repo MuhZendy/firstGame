@@ -20,7 +20,7 @@ bool initGame() {
     gameState.gameMap.create(30, 30); // Example: create a 30x30 game map
     for (int y = 0; y < gameState.gameMap.height; ++y) {
         for (int x = 0; x < gameState.gameMap.width; ++x) {
-            if ((x - 10)*(x - 10) + (y - 10)*(y - 10) < 25) gameState.gameMap.getBlock(x, y).id = Block::dirt; // Create a circular dirt area
+            if ((x - 10)*(x - 10) + (y - 10)*(y - 10) < 25) gameState.gameMap.getBlock(x, y).id = Block::pearl; // Create a circular dirt area
         }
     }
 
