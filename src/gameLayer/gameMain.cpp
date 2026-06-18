@@ -82,7 +82,34 @@ bool updateGame() {
     for (int y = startY; y <= endY; ++y) {
         for (int x = startX; x <= endX; ++x) {
             Block& block = gameState.gameMap.getBlock(x, y);
-            if (block.id != Block::air) {
+            if (block.id == Block::woodLog) {
+                Block* leftBlock = gameState.gameMap.getBlockSafe(x - 1, y);
+                Block* rightBlock = gameState.gameMap.getBlockSafe(x + 1, y);
+                Block* topBlock = gameState.gameMap.getBlockSafe(x, y - 1);
+                Block* bottomBlock = gameState.gameMap.getBlockSafe(x, y + 1);
+
+                int logId = 0;
+                
+                bool leftLeaf = (leftBlock && leftBlock->id == Block::leaves);
+                bool rightLeaf = (rightBlock && rightBlock->id == Block::leaves);
+                bool topLeaf = (topBlock && topBlock->id == Block::leaves);
+                bool topLog = (topBlock && topBlock->id == Block::woodLog);
+                bool bottomLog = (bottomBlock && bottomBlock->id == Block::woodLog);
+
+                if (topLeaf) logId = 5; // Top has leaves
+                else if (leftLeaf && rightLeaf) logId = 1; // Both sides have leaves
+                else if (leftLeaf) logId = 3; // Left side has leaves
+                else if (rightLeaf) logId = 2; // Right side has leaves
+                else if (!topLog && !bottomLog) logId = 7; // Both sides have no logs
+                else if (!topLog) logId = 6; // Top has no log
+                else if (!bottomLog) logId = 4; // Bottom has no log
+                else logId = 0; // No leaves but have logs on both sides
+
+                Rectangle textureUV = getTextureAtlasUV(logId, 0, 32, 32); // Assuming wood log texture is at (0, 0) in the atlas
+                DrawTexturePro(assetManager.treeTexture, textureUV, 
+                    { (float)x, (float)y, 1.0f, 1.0f }, {}, 0, WHITE);
+            }
+            else if (block.id != Block::air) {
                 Rectangle textureUV = getTextureAtlasUV(block.id, 0, 32, 32); // Assuming each block texture is 32x32 pixels
                 DrawTexturePro(assetManager.texture, textureUV, 
                     { (float)x, (float)y, 1.0f, 1.0f }, {}, 0, WHITE);
