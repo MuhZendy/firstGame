@@ -3,5 +3,6 @@
 
 struct AssetManager {
     Texture2D texture = {};
+    Texture2D frame = {};
     void loadAll();
 };

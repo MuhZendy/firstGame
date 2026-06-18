@@ -34,7 +34,7 @@ bool initGame() {
 bool updateGame() {
     // Update game logic here
     // Return false if the game should be closed
-    ClearBackground(BLUE);
+    ClearBackground({75, 75, 150, 255});
 
     float deltaTime = GetFrameTime();
     if (deltaTime > 0.1f) deltaTime = 0.1f; // Cap deltaTime to avoid big jumps
@@ -43,6 +43,23 @@ bool updateGame() {
     if (IsKeyDown(KEY_S)) gameState.camera.target.y += 7.0f * deltaTime;
     if (IsKeyDown(KEY_A)) gameState.camera.target.x -= 7.0f * deltaTime;
     if (IsKeyDown(KEY_D)) gameState.camera.target.x += 7.0f * deltaTime;
+
+    Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameState.camera);
+    int blockX = (int)std::floor(worldPos.x);
+    int blockY = (int)std::floor(worldPos.y);
+
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
+        if (block) {
+            *block = {};
+        }
+    }
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+        Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
+        if (block) {
+            block->id = Block::dirt;
+        }
+    }
 
     gameState.camera.offset = { (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2 };
     BeginMode2D(gameState.camera);
@@ -57,6 +74,9 @@ bool updateGame() {
             }
         }
     }
+
+    DrawTexturePro(assetManager.frame, {0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height}, 
+        {(float)blockX, (float)blockY, 1.0f, 1.0f}, {}, 0, WHITE);
 
     EndMode2D();
 
