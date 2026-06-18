@@ -18,7 +18,7 @@ bool initGame() {
     // Initialize game resources here
     assetManager.loadAll();
 
-    gameState.gameMap.create(30, 30); // Example: create a 30x30 game map
+    gameState.gameMap.create(700, 500); // Example: create a 700x500 game map
     for (int y = 0; y < gameState.gameMap.height; ++y) {
         for (int x = 0; x < gameState.gameMap.width; ++x) {
             if (y > 20) gameState.gameMap.getBlock(x, y).id = Block::dirt;
@@ -71,8 +71,16 @@ bool updateGame() {
     gameState.camera.offset = { (float)GetScreenWidth() / 2, (float)GetScreenHeight() / 2 };
     BeginMode2D(gameState.camera);
 
-    for (int y = 0; y < gameState.gameMap.height; ++y) {
-        for (int x = 0; x < gameState.gameMap.width; ++x) {
+    Vector2 topLeft = GetScreenToWorld2D({ 0, 0 }, gameState.camera);
+    Vector2 bottomRight = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, gameState.camera);
+
+    int startX = std::max(0, (int)std::floor(topLeft.x));
+    int startY = std::max(0, (int)std::floor(topLeft.y));
+    int endX = std::min(gameState.gameMap.width - 1, (int)std::ceil(bottomRight.x));
+    int endY = std::min(gameState.gameMap.height - 1, (int)std::ceil(bottomRight.y));
+
+    for (int y = startY; y <= endY; ++y) {
+        for (int x = startX; x <= endX; ++x) {
             Block& block = gameState.gameMap.getBlock(x, y);
             if (block.id != Block::air) {
                 Rectangle textureUV = getTextureAtlasUV(block.id, 0, 32, 32); // Assuming each block texture is 32x32 pixels
@@ -86,6 +94,8 @@ bool updateGame() {
         {(float)blockX, (float)blockY, 1.0f, 1.0f}, {}, 0, WHITE);
 
     EndMode2D();
+
+    DrawFPS(10, 10);
 
     return true;
 }

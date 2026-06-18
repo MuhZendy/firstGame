@@ -32,7 +32,7 @@ int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(800, 600, "Resizable Window Example");
     SetExitKey(0); // Disable default exit key (ESC)
-    SetTargetFPS(60);
+    SetTargetFPS(120);
 
     rlImGuiSetup(true);
 
