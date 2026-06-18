@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "assetManager.h"
 #include "raylib.h"
 #include "gameMain.h"
@@ -15,12 +17,12 @@ bool initGame() {
     // Initialize game resources here
     assetManager.loadAll();
 
-    gameState.gameMap.create(10, 10); // Example: create a 10x10 game map
-    gameState.gameMap.getBlock(0, 0).id = Block::dirt;
-    gameState.gameMap.getBlock(1, 1).id = Block::glass;
-    gameState.gameMap.getBlock(2, 2).id = Block::stone;
-    gameState.gameMap.getBlock(3, 3).id = Block::gold;
-    gameState.gameMap.getBlock(4, 4).id = Block::furnace;
+    gameState.gameMap.create(30, 30); // Example: create a 30x30 game map
+    for (int y = 0; y < gameState.gameMap.height; ++y) {
+        for (int x = 0; x < gameState.gameMap.width; ++x) {
+            if ((x - 10)*(x - 10) + (y - 10)*(y - 10) < 25) gameState.gameMap.getBlock(x, y).id = Block::dirt; // Create a circular dirt area
+        }
+    }
 
     gameState.camera.target = { 0, 0 };
     gameState.camera.rotation = 0.0f;
