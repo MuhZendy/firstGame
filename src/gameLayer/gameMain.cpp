@@ -2,6 +2,7 @@
 
 #include "assetManager.h"
 #include "raylib.h"
+#include "imgui.h"
 #include "gameMain.h"
 #include "gameMap.h"
 #include "helpers.h"
@@ -20,7 +21,7 @@ bool initGame() {
     gameState.gameMap.create(30, 30); // Example: create a 30x30 game map
     for (int y = 0; y < gameState.gameMap.height; ++y) {
         for (int x = 0; x < gameState.gameMap.width; ++x) {
-            if ((x - 10)*(x - 10) + (y - 10)*(y - 10) < 25) gameState.gameMap.getBlock(x, y).id = Block::pearl; // Create a circular dirt area
+            if (y > 20) gameState.gameMap.getBlock(x, y).id = Block::dirt;
         }
     }
 
@@ -34,6 +35,12 @@ bool initGame() {
 bool updateGame() {
     // Update game logic here
     // Return false if the game should be closed
+
+    static int selected_index = 0;
+    ImGui::Begin("Block Selecotor");
+    ImGui::Combo("Block Type", &selected_index, Block::getNames(), Block::BLOCKS_COUNT);
+    ImGui::End();
+
     ClearBackground({75, 75, 150, 255});
 
     float deltaTime = GetFrameTime();
@@ -57,7 +64,7 @@ bool updateGame() {
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
         Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
         if (block) {
-            block->id = Block::dirt;
+            block->id = selected_index;
         }
     }
 

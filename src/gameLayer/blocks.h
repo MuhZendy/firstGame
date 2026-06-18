@@ -1,6 +1,64 @@
 #pragma once
 #include <cstdint>
 
+static const char* BLOCK_NAMES[] = {
+	"Air",
+	"Dirt",
+	"Grass Block",
+	"Stone",
+	"Grass",
+	"Sand",
+	"Sand Ruby",
+	"Sand Stone",
+	"Wood Plank",
+	"Stone Bricks",
+	"Clay",
+	"Wood Log",
+	"Leaves",
+	"Copper",
+	"Iron",
+	"Gold",
+	"Copper Block",
+	"Iron Block",
+	"Gold Block",
+	"Bricks",
+	"Snow",
+	"Ice",
+	"Ruby Block",
+	"Platform",
+	"Work Bench",
+	"Glass",
+	"Furnace",
+	"Painting",
+	"Sappling",
+	"Snow Blue Ruby",
+	"Blue Ruby Block",
+	"Door",
+	"Jar",
+	"Table",
+	"Wordrobe",
+	"Book Shelf",
+	"Snow Bricks",
+	"Ice Table",
+	"Ice Wordrobe",
+	"Ice Book Shelf",
+	"Ice Platform",
+	"Sand Table",
+	"Sand Wordrobe",
+	"Sand Book Shelf",
+	"Sand Platform",
+	"Wooden Chest",
+	"Ice Chest",
+	"Sand Chest",
+	"Bone Chest",
+	"Bone Bricks",
+	"Bone Bench",
+	"Bone Wordrobe",
+	"Bone Book Shelf",
+	"Bone Platform",
+	"Pearl",
+};
+
 struct Block {
     enum {
         air = 0,
@@ -64,4 +122,7 @@ struct Block {
 
     uint16_t id; // Block type ID
     // Add more block properties here (e.g., durability, texture index, etc.)
+	static const char** getNames() {
+		return BLOCK_NAMES;
+	}
 };
