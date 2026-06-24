@@ -6,6 +6,7 @@
 #include "gameMain.h"
 #include "gameMap.h"
 #include "helpers.h"
+#include "randomStuff.h"
 struct GameState {
     // Add game state variables here
     GameMap gameMap;
@@ -81,6 +82,7 @@ bool updateGame() {
 
     for (int y = startY; y <= endY; ++y) {
         for (int x = startX; x <= endX; ++x) {
+            int blockVariation = (x + y) % 4; // Example: 4 variations for each block type
             Block& block = gameState.gameMap.getBlock(x, y);
             if (block.id == Block::woodLog) {
                 Block* leftBlock = gameState.gameMap.getBlockSafe(x - 1, y);
@@ -105,12 +107,12 @@ bool updateGame() {
                 else if (!bottomLog) logId = 4; // Bottom has no log
                 else logId = 0; // No leaves but have logs on both sides
 
-                Rectangle textureUV = getTextureAtlasUV(logId, 0, 32, 32); // Assuming wood log texture is at (0, 0) in the atlas
+                Rectangle textureUV = getTextureAtlasUV(logId, blockVariation, 32, 32); // Assuming wood log texture is at (0, 0) in the atlas
                 DrawTexturePro(assetManager.treeTexture, textureUV, 
                     { (float)x, (float)y, 1.0f, 1.0f }, {}, 0, WHITE);
             }
             else if (block.id != Block::air) {
-                Rectangle textureUV = getTextureAtlasUV(block.id, 0, 32, 32); // Assuming each block texture is 32x32 pixels
+                Rectangle textureUV = getTextureAtlasUV(block.id, blockVariation, 32, 32); // Assuming each block texture is 32x32 pixels
                 DrawTexturePro(assetManager.texture, textureUV, 
                     { (float)x, (float)y, 1.0f, 1.0f }, {}, 0, WHITE);
             }
