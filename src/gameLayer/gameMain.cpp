@@ -7,10 +7,12 @@
 #include "gameMap.h"
 #include "helpers.h"
 #include "randomStuff.h"
+#include "worldGenerator.h"
 struct GameState {
     // Add game state variables here
     GameMap gameMap;
     Camera2D camera;
+    float cameraSpeed = 7.0f;
 } gameState;
 
 AssetManager assetManager;
@@ -19,12 +21,7 @@ bool initGame() {
     // Initialize game resources here
     assetManager.loadAll();
 
-    gameState.gameMap.create(700, 500); // Example: create a 700x500 game map
-    for (int y = 0; y < gameState.gameMap.height; ++y) {
-        for (int x = 0; x < gameState.gameMap.width; ++x) {
-            if (y > 20) gameState.gameMap.getBlock(x, y).id = Block::dirt;
-        }
-    }
+    generateWorld(gameState.gameMap, 700, 80); // Example: create a 700x40 game map
 
     gameState.camera.target = { 0, 0 };
     gameState.camera.rotation = 0.0f;
@@ -47,10 +44,10 @@ bool updateGame() {
     float deltaTime = GetFrameTime();
     if (deltaTime > 0.1f) deltaTime = 0.1f; // Cap deltaTime to avoid big jumps
 
-    if (IsKeyDown(KEY_W)) gameState.camera.target.y -= 7.0f * deltaTime;
-    if (IsKeyDown(KEY_S)) gameState.camera.target.y += 7.0f * deltaTime;
-    if (IsKeyDown(KEY_A)) gameState.camera.target.x -= 7.0f * deltaTime;
-    if (IsKeyDown(KEY_D)) gameState.camera.target.x += 7.0f * deltaTime;
+    if (IsKeyDown(KEY_W)) gameState.camera.target.y -= gameState.cameraSpeed * deltaTime;
+    if (IsKeyDown(KEY_S)) gameState.camera.target.y += gameState.cameraSpeed * deltaTime;
+    if (IsKeyDown(KEY_A)) gameState.camera.target.x -= gameState.cameraSpeed * deltaTime;
+    if (IsKeyDown(KEY_D)) gameState.camera.target.x += gameState.cameraSpeed * deltaTime;
 
     Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameState.camera);
     int blockX = (int)std::floor(worldPos.x);
@@ -123,6 +120,11 @@ bool updateGame() {
         {(float)blockX, (float)blockY, 1.0f, 1.0f}, {}, 0, WHITE);
 
     EndMode2D();
+
+    ImGui::Begin("Game Controls");
+    ImGui::SliderFloat("Camera Zoom", &gameState.camera.zoom, 10, 150);
+    ImGui::SliderFloat("Camera Speed", &gameState.cameraSpeed, 5, 100);
+    ImGui::End();
 
     DrawFPS(10, 10);
 
