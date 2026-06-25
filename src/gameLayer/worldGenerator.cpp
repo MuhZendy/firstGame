@@ -1,3 +1,4 @@
+#include <FastNoiseSIMD.h>
 #include "worldGenerator.h"
 #include "randomStuff.h"
 
