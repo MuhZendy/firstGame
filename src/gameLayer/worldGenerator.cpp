@@ -1,13 +1,14 @@
-#include <FastNoiseSIMD.h>
+#include <FastNoise/FastNoise.h>
 #include "worldGenerator.h"
 #include "randomStuff.h"
 
-void generateWorld(GameMap& gameMap, int width, int height) {
-    gameMap.create(width, height);
+void generateWorld(GameMap& gameMap, int seed) {
+    int width = gameMap.width;
+    int height = gameMap.height;
 
     int dirtHeight = height / 4; // Example: Half the height is dirt
 
-    std::ranlux24_base rng(std::random_device{}()); // Random number generator
+    std::ranlux24_base rng(seed); // Random number generator
     int previousHeight = dirtHeight; // Start with the initial dirt height
 
     // Example: Fill the bottom half with dirt and the top half with air
