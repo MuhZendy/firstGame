@@ -42,7 +42,9 @@ static void generateWorldOutline(int* worldOutline, int seed) {
     for (int x = 0; x < width; x++) {
         float noiseMult = lerp(heightNoise[x], heightNoiseSmooth[x], noiseMix[x]);
         worldOutline[x] = lerp(worldMinHeight, worldMaxHeight, noiseMult);
+        // std::cout << noiseMult << ' ' << worldMinHeight << ' ' << worldMaxHeight << ' ' << worldOutline[x] << ';';
     }
+    // std::cout << std::endl;
 }
 
 static void addStoneLayer(GameMap& gameMap, int* worldOutline) {
@@ -84,6 +86,19 @@ static void addDesertBiome(GameMap& gameMap, int seed) {
     }
 }
 
+static void addCaves(GameMap& gameMap, int seed) {
+    float filter[width*height];
+    source->GenUniformGrid2D(filter, 0.f, 0.f, width, height, 1.f, 1.f, seed+7331);
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            if (filter[y * width + x] < 0.1f) {
+                gameMap.getBlock(x, y).id = Block::air;
+            }
+        }
+    }
+}
+
 void generateWorld(GameMap& gameMap, int seed) {
     width = gameMap.width;
     height = gameMap.height;
@@ -91,7 +106,7 @@ void generateWorld(GameMap& gameMap, int seed) {
     std::ranlux24_base rng(seed++); // Random number generator
 
     int worldOutline[width];
-    worldMinHeight = height / 4;
+    worldMinHeight = height / 32;
     worldMaxHeight = height;
 
     setupNoiseGenerator();
@@ -99,4 +114,5 @@ void generateWorld(GameMap& gameMap, int seed) {
     addStoneLayer(gameMap, worldOutline);
     addDirtLayer(gameMap, worldOutline, seed);
     addDesertBiome(gameMap, seed);
+    addCaves(gameMap, seed);
 }

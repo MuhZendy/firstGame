@@ -24,7 +24,7 @@ bool initGame() {
     gameState.gameMap.create(512, 256);
     generateWorld(gameState.gameMap, 0); // Example: create a 700x40 game map
 
-    gameState.camera.target = { 0, 0 };
+    gameState.camera.target = { 256, 128 };
     gameState.camera.rotation = 0.0f;
     gameState.camera.zoom = 100.0f;
 
