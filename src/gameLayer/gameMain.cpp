@@ -21,7 +21,7 @@ bool initGame() {
     // Initialize game resources here
     assetManager.loadAll();
 
-    gameState.gameMap.create(700, 80);
+    gameState.gameMap.create(512, 256);
     generateWorld(gameState.gameMap, 0); // Example: create a 700x40 game map
 
     gameState.camera.target = { 0, 0 };
