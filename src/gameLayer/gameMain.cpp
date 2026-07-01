@@ -48,7 +48,22 @@ bool updateGame() {
 
     if (imGuiEnabled) {
         ImGui::Begin("Block Selecotor");
-        ImGui::Combo("Block Type", &gameState.selectedBlockType, Block::getNames(), Block::BLOCKS_COUNT);
+        for (int i = 0; i < Block::BLOCKS_COUNT; i++) {
+            auto atlas = getTextureAtlasUV(i, 0, 32, 32);
+            atlas.x /= assetManager.texture.width;
+            atlas.y /= assetManager.texture.height;
+            atlas.width /= assetManager.texture.width;
+            atlas.height /= assetManager.texture.height;
+            ImGui::PushID(i);
+            ImTextureID texture = (ImTextureID)(intptr_t)assetManager.texture.id;
+            if (ImGui::ImageButton(texture, {35, 35}, {atlas.x, atlas.y}, {atlas.x + atlas.width, atlas.x + atlas.height})) {
+                gameState.selectedBlockType = i;
+            }
+            ImGui::PopID();
+            if (i % 10 != 0) {
+                ImGui::SameLine();
+            }
+        }
         ImGui::End();
 
         ImGui::Begin("Game Controls");
