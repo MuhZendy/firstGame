@@ -13,7 +13,11 @@ struct GameState {
     GameMap gameMap;
     Camera2D camera;
     float cameraSpeed = 7.0f;
+    int selectedBlockType = Block::dirt; // Default selected block type
 } gameState;
+
+static bool imGuiEnabled = false; // Flag to toggle ImGui interface
+static bool imGuiEnabledDebounce = false;
 
 AssetManager assetManager;
 
@@ -34,11 +38,24 @@ bool initGame() {
 bool updateGame() {
     // Update game logic here
     // Return false if the game should be closed
+    if (IsKeyDown(KEY_E) && !imGuiEnabledDebounce) {
+        imGuiEnabled = !imGuiEnabled;
+        imGuiEnabledDebounce = true;
+    }
+    if (!IsKeyDown(KEY_E)) {
+        imGuiEnabledDebounce = false;
+    }
 
-    static int selected_index = 0;
-    ImGui::Begin("Block Selecotor");
-    ImGui::Combo("Block Type", &selected_index, Block::getNames(), Block::BLOCKS_COUNT);
-    ImGui::End();
+    if (imGuiEnabled) {
+        ImGui::Begin("Block Selecotor");
+        ImGui::Combo("Block Type", &gameState.selectedBlockType, Block::getNames(), Block::BLOCKS_COUNT);
+        ImGui::End();
+
+        ImGui::Begin("Game Controls");
+        ImGui::SliderFloat("Camera Zoom", &gameState.camera.zoom, 10, 150);
+        ImGui::SliderFloat("Camera Speed", &gameState.cameraSpeed, 5, 100);
+        ImGui::End();
+    }
 
     ClearBackground({75, 75, 150, 255});
 
@@ -54,16 +71,21 @@ bool updateGame() {
     int blockX = (int)std::floor(worldPos.x);
     int blockY = (int)std::floor(worldPos.y);
 
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
-        if (block) {
-            *block = {};
+    if (!imGuiEnabled) {
+        if (gameState.selectedBlockType < 0 || gameState.selectedBlockType >= Block::BLOCKS_COUNT) {
+            gameState.selectedBlockType = Block::dirt; // Reset to default if out of bounds
         }
-    }
-    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-        Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
-        if (block) {
-            block->id = selected_index;
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
+            if (block) {
+                *block = {};
+            }
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+            Block* block = gameState.gameMap.getBlockSafe(blockX, blockY);
+            if (block) {
+                block->id = gameState.selectedBlockType;
+            }
         }
     }
 
@@ -121,11 +143,6 @@ bool updateGame() {
         {(float)blockX, (float)blockY, 1.0f, 1.0f}, {}, 0, WHITE);
 
     EndMode2D();
-
-    ImGui::Begin("Game Controls");
-    ImGui::SliderFloat("Camera Zoom", &gameState.camera.zoom, 10, 150);
-    ImGui::SliderFloat("Camera Speed", &gameState.cameraSpeed, 5, 100);
-    ImGui::End();
 
     DrawFPS(10, 10);
 

@@ -8,7 +8,9 @@ static auto source = FastNoise::New<FastNoise::Simplex>();
 static auto fractal = FastNoise::New<FastNoise::FractalFBm>();
 static auto cellular = FastNoise::New<FastNoise::CellularLookup>();
 static int width, height;
-static int worldMinHeight, worldMaxHeight;
+static int outlineMinHeight, outlineMaxHeight;
+static std::vector<int> worldOutline;
+static GameMap* gameMapPtr;
 
 static float lerp(float a, float b, float t) {
     return a + (b - a) * t;
@@ -31,7 +33,7 @@ static void setupNoiseGenerator() {
     cellular->SetSeedOffset(1337);
 }
 
-static void generateWorldOutline(int* worldOutline, int seed) {
+static void generateWorldOutline(int seed) {
 
     float heightNoise[width], heightNoiseSmooth[width], noiseMix[width];
 
@@ -41,21 +43,20 @@ static void generateWorldOutline(int* worldOutline, int seed) {
 
     for (int x = 0; x < width; x++) {
         float noiseMult = lerp(heightNoise[x], heightNoiseSmooth[x], noiseMix[x]);
-        worldOutline[x] = lerp(worldMinHeight, worldMaxHeight, noiseMult);
-        // std::cout << noiseMult << ' ' << worldMinHeight << ' ' << worldMaxHeight << ' ' << worldOutline[x] << ';';
+        worldOutline[x] = lerp(outlineMinHeight, outlineMaxHeight, noiseMult);
     }
     // std::cout << std::endl;
 }
 
-static void addStoneLayer(GameMap& gameMap, int* worldOutline) {
+static void addStoneLayer() {
     for (int x = 0; x < width; x++) {
-        for (int y = worldOutline[x]; y < worldMaxHeight; y++) {
-            gameMap.getBlock(x, y).id = Block::stone;
+        for (int y = worldOutline[x]; y < height; y++) {
+            gameMapPtr->getBlock(x, y).id = Block::stone;
         }
     }
 }
 
-static void addDirtLayer(GameMap& gameMap, int* worldOutline, int seed) {
+static void addDirtLayer(int seed) {
     float offsetNoise[width];
     fractal->GenUniformGrid2D(offsetNoise, 0.f, 0.f, width, 1, 1.f, 1.f, seed+4);
 
@@ -65,54 +66,56 @@ static void addDirtLayer(GameMap& gameMap, int* worldOutline, int seed) {
     for (int x = 0; x < width; x++) {
         int dirtHeight = worldOutline[x] - lerp(maxDirtOffset, minDirtOffset, offsetNoise[x]);
         for (int y = dirtHeight; y < worldOutline[x]; y++) {
-            gameMap.getBlock(x, y).id = Block::dirt;
+            gameMapPtr->getBlock(x, y).id = Block::dirt;
         }
     }
 }
 
-static void addDesertBiome(GameMap& gameMap, int seed) {
+static void addDesertBiome(int seed) {
     float biomeNoise[width];
     cellular->GenUniformGrid2D(biomeNoise, 0.f, 0.f, width, 1, 1.f, 1.f, seed);
 
     for (int x = 0; x < width; x++) {
         if (biomeNoise[x] < 0.28f) continue;
         for (int y = 0; y < height; y++) {
-            if (gameMap.getBlock(x, y).id == Block::dirt) {
-                gameMap.getBlock(x, y).id = Block::sand;
-            } else if (gameMap.getBlock(x, y).id == Block::stone) {
-                gameMap.getBlock(x, y).id = Block::sandStone;
+            if (gameMapPtr->getBlock(x, y).id == Block::dirt) {
+                gameMapPtr->getBlock(x, y).id = Block::sand;
+            } else if (gameMapPtr->getBlock(x, y).id == Block::stone) {
+                gameMapPtr->getBlock(x, y).id = Block::sandStone;
             }
         }
     }
 }
 
-static void addCaves(GameMap& gameMap, int seed) {
+static void addCaves(int seed) {
     float filter[width*height];
     source->GenUniformGrid2D(filter, 0.f, 0.f, width, height, 1.f, 1.f, seed+7331);
 
     for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
+        for (int y = worldOutline[x] + 10; y < height; y++) {
             if (filter[y * width + x] < 0.1f) {
-                gameMap.getBlock(x, y).id = Block::air;
+                gameMapPtr->getBlock(x, y).id = Block::air;
             }
         }
     }
 }
 
 void generateWorld(GameMap& gameMap, int seed) {
+    gameMapPtr = &gameMap;
     width = gameMap.width;
     height = gameMap.height;
+    worldOutline.resize(width);
 
     std::ranlux24_base rng(seed++); // Random number generator
 
     int worldOutline[width];
-    worldMinHeight = height / 32;
-    worldMaxHeight = height;
+    outlineMinHeight = height / 32;
+    outlineMaxHeight = height / 2;
 
     setupNoiseGenerator();
-    generateWorldOutline(worldOutline, seed);
-    addStoneLayer(gameMap, worldOutline);
-    addDirtLayer(gameMap, worldOutline, seed);
-    addDesertBiome(gameMap, seed);
-    addCaves(gameMap, seed);
+    generateWorldOutline(seed);
+    addStoneLayer();
+    addDirtLayer(seed);
+    addDesertBiome(seed);
+    addCaves(seed);
 }
