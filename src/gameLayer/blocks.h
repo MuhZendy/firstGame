@@ -125,4 +125,10 @@ struct Block {
 	static const char** getNames() {
 		return BLOCK_NAMES;
 	}
+
+	void sanitize() {
+		if (id >= BLOCKS_COUNT) {
+			id = 0;
+		}
+	}
 };
